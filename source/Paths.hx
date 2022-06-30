@@ -74,6 +74,16 @@ class Paths
 				}
 			}
 		}
+
+		// clear all sounds that are cached
+		for (key in currentTrackedSounds.keys()) {
+			if (!localTrackedAssets.contains(key) 
+			&& !dumpExclusions.contains(key) && key != null) {
+				//trace('test: ' + dumpExclusions, key);
+				Assets.cache.clear(key);
+				currentTrackedSounds.remove(key);
+			}
+		}	
 		// run the garbage collector for good measure lmfao
 		System.gc();
 	}
@@ -183,7 +193,8 @@ class Paths
 
 	static public function sound(key:String, ?library:String):Dynamic
 	{
-		return getPath('sounds/$key.$SOUND_EXT', SOUND, library);
+		var sound:Sound = loadSound('sounds', key, library);
+		return sound;
 	}
 	
 	inline static public function soundRandom(key:String, min:Int, max:Int, ?library:String)
@@ -193,17 +204,33 @@ class Paths
 
 	inline static public function music(key:String, ?library:String):Dynamic
 	{
-		return getPath('music/$key.$SOUND_EXT', MUSIC, library);
+		var file:Sound = loadSound('music', key, library);
+		return file;
 	}
 
 	inline static public function voices(song:String):Any
 	{
-		return 'songs:assets/songs/${song.toLowerCase().replace(' ', '-')}/Voices.$SOUND_EXT';
+		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase() + '/Voices';
+		var file;
+		#if PRELOAD_ALL
+		file = loadSound('songs', songLowercase);
+		#else
+		file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
+		#end
+		return file;
 	}
 
 	inline static public function inst(song:String):Any
 	{
-		return 'songs:assets/songs/${song.toLowerCase().replace(' ', '-')}/Inst.$SOUND_EXT';
+		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase() + '/Inst';
+		var file;
+		#if PRELOAD_ALL
+		file = loadSound('songs', songLowercase);
+		#else
+		file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
+		#end
+
+		return file;
 	}
 
 	inline static public function image(key:String, ?library:String):FlxGraphic
@@ -260,6 +287,29 @@ class Paths
 		}
 		trace('oh no its returning null NOOOO');
 		return null;
+	}
+	
+	public static var currentTrackedSounds:Map<String, Sound> = [];
+
+	public static function loadSound(path:String, key:String, ?library:String)
+	{
+		// I hate this so god damn much
+		var gottenPath:String = getPath('$path/$key.$SOUND_EXT', SOUND, library);
+		gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
+		// trace(gottenPath);
+		if (!currentTrackedSounds.exists(gottenPath))
+		{
+			var folder:String = '';
+
+			if (path == 'songs')
+				folder = 'songs:';
+
+			currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(folder + getPath('$path/$key.$SOUND_EXT', SOUND, library)));
+		}
+
+		localTrackedAssets.push(gottenPath);
+
+		return currentTrackedSounds.get(gottenPath);
 	}
 	
 	#if MODS_ALLOWED
