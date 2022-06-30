@@ -22,7 +22,7 @@ using StringTools;
 
 class Paths
 {
-	inline public static var SOUND_EXT = #if web "mp3" #else "ogg" #end;
+	inline public static var SOUND_EXT = "ogg";
 	inline public static var VIDEO_EXT = "mp4";
 
 	#if MODS_ALLOWED
@@ -210,27 +210,16 @@ class Paths
 
 	inline static public function voices(song:String):Any
 	{
-		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase() + '/Voices';
-		var file;
-		#if PRELOAD_ALL
-		file = loadSound('songs', songLowercase);
-		#else
-		file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
-		#end
-		return file;
+		var songKey:String = '${song.toLowerCase().replace(' ', '-')}/Voices';
+		var voices = loadSound('songs', songKey);
+		return voices;
 	}
 
 	inline static public function inst(song:String):Any
 	{
-		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase() + '/Inst';
-		var file;
-		#if PRELOAD_ALL
-		file = loadSound('songs', songLowercase);
-		#else
-		file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
-		#end
-
-		return file;
+		var songKey:String = '${song.toLowerCase().replace(' ', '-')}/Inst';
+		var inst = loadSound('songs', songKey);
+		return inst;
 	}
 
 	inline static public function image(key:String, ?library:String):FlxGraphic
