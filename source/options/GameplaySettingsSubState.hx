@@ -137,6 +137,14 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.changeValue = 0.1;
 		addOption(option);
 
+		var option:Option = new Option('Input Type',
+			"Changes the input type between engines",
+			'inputType',
+			'string',
+			'PE 0.5.2',
+			['PE 0.5.2', 'KE 1.5.4']);
+		addOption(option);
+
 		super();
 	}
 }
