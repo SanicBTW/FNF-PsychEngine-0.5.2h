@@ -3695,12 +3695,17 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
+			else if(!ClientPrefs.ghostTapping)
+			{
+				trace("missed but currently broken");
+			}
+			/*
 			else if (!ClientPrefs.ghostTapping)
 			{
 				for (shit in 0...pressArray.length)
 					if (pressArray[shit])
 						noteMiss(shit, null);
-			}
+			}*/
 			if(dontCheck && possibleNotes.length > 0 && ClientPrefs.ghostTapping && !cpuControlled)
 			{
 				if (mashViolations > 8)
@@ -3739,14 +3744,6 @@ class PlayState extends MusicBeatState
 	function noteMiss(direction:Int = 0, daNote:Note):Void { //You didn't hit the key and let it go offscreen, also used by Hurt Notes
 		if (!boyfriend.stunned)
 		{
-			notes.forEachAlive(function(note:Note) {
-				if (daNote != note && daNote.mustPress && daNote.noteData == note.noteData && daNote.isSustainNote == note.isSustainNote && Math.abs(daNote.strumTime - note.strumTime) < 1) {
-					note.kill();
-					notes.remove(note, true);
-					note.destroy();
-				}
-			});
-
 			health -= daNote.missHealth * healthLoss;
 			if(instakillOnMiss)
 			{
