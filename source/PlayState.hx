@@ -3470,10 +3470,10 @@ class PlayState extends MusicBeatState
 			currentTimingShown.size = 20;
 			if (currentTimingShown.alpha != 1)
 				currentTimingShown.alpha = 1;
-			if(!cpuControlled) add(currentTimingShown);
+			if(!cpuControlled) insert(members.indexOf(strumLineNotes), currentTimingShown);
 
 			currentTimingShown.velocity.x += comboSpr.velocity.x;
-			if(!cpuControlled) add(rating);
+			if(!cpuControlled) insert(members.indexOf(strumLineNotes), rating);
 
 			if (!PlayState.isPixelStage)
 			{
@@ -3491,6 +3491,12 @@ class PlayState extends MusicBeatState
 			currentTimingShown.updateHitbox();
 			comboSpr.updateHitbox();
 			rating.updateHitbox();
+
+			currentTimingShown.screenCenter();
+			currentTimingShown.x = comboSpr.x;
+			currentTimingShown.y = rating.y + 250;
+			currentTimingShown.acceleration.y = 600;
+			currentTimingShown.velocity.y -= 150;
 
 			var seperatedScore:Array<Int> = [];
 
@@ -3519,12 +3525,18 @@ class PlayState extends MusicBeatState
 
 				if (!PlayState.isPixelStage)
 				{
+					rating.setGraphicSize(Std.int(rating.width * 0.7));
+					rating.antialiasing = ClientPrefs.globalAntialiasing;
+					comboSpr.setGraphicSize(Std.int(comboSpr.width * 0.7));
+					comboSpr.antialiasing = ClientPrefs.globalAntialiasing;
 					numScore.antialiasing = ClientPrefs.globalAntialiasing;
 					numScore.setGraphicSize(Std.int(numScore.width * 0.5));
 				}
 				else
 				{
 					numScore.setGraphicSize(Std.int(numScore.width * daPixelZoom));
+					rating.setGraphicSize(Std.int(rating.width * daPixelZoom * 0.85));
+					comboSpr.setGraphicSize(Std.int(comboSpr.width * daPixelZoom * 0.85));
 				}
 				numScore.updateHitbox();
 
@@ -3533,7 +3545,7 @@ class PlayState extends MusicBeatState
 				numScore.velocity.x = FlxG.random.float(-5, 5);
 				numScore.visible = !ClientPrefs.hideHud;
 				
-				add(numScore);
+				insert(members.indexOf(strumLineNotes), numScore);
 
 				FlxTween.tween(numScore, {alpha: 0}, 0.2, {
 					onComplete: function(tween:FlxTween)
