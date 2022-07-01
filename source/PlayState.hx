@@ -3739,6 +3739,18 @@ class PlayState extends MusicBeatState
 			if (boyfriend.animation.curAnim.name.startsWith('sing') && !boyfriend.animation.curAnim.name.endsWith('miss'))
 				boyfriend.playAnim('idle');
 		}
+
+		playerStrums.forEach(function(spr:StrumNote)
+		{
+			if(pressArray[spr.ID] && spr.animation.curAnim.name != 'confirm') {
+				spr.playAnim('pressed');
+				spr.resetAnim = 0;
+			}
+			if(releaseArray[spr.ID]) {
+				spr.playAnim('static');
+				spr.resetAnim = 0;
+			}
+		});
 	}
 
 	function noteMiss(direction:Int = 0, daNote:Note):Void { //You didn't hit the key and let it go offscreen, also used by Hurt Notes
