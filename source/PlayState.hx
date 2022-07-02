@@ -273,7 +273,6 @@ class PlayState extends MusicBeatState
 	private var ss:Bool = false;
 	private var totalNotesHit:Float = 0;
 	private var totalNotesHitDefault:Float = 0;
-	var notesHitArray:Array<Date> = [];
 	private var curSection:Int = 0;
 	var songScoreDef:Int = 0;
 	var mashing:Int = 0;
@@ -3774,7 +3773,6 @@ class PlayState extends MusicBeatState
 			vocals.volume = 0;
 			if(!practiceMode) songScore -= 10;
 
-			totalNotesHit -= 1;
 			totalPlayed++;
 			RecalculateRating();
 
@@ -3906,10 +3904,6 @@ class PlayState extends MusicBeatState
 		note.rating = Ratings.CalculateRating(noteDiff);
 		if (note.rating == "miss")
 			return;	
-		// add newest note to front of notesHitArray
-		// the oldest notes are at the end and are removed first	
-		if (!note.isSustainNote)
-			notesHitArray.unshift(Date.now());
 		if (!resetMashViolation && mashViolations >= 1)
 			mashViolations--;
 		if (mashViolations < 0)
@@ -3953,8 +3947,6 @@ class PlayState extends MusicBeatState
 				popUpScore(note);
 				if(combo > 9999) combo = 9999;
 			}
-			else
-				totalNotesHit += 1;
 
 			health += note.hitHealth * healthGain;
 
