@@ -1180,7 +1180,8 @@ class PlayState extends MusicBeatState
 		{
 			startCountdown();
 		}
-		RecalculateRating();
+		updateAccuracy();
+		//RecalculateRating();
 
 		//PRECACHING MISS SOUNDS BECAUSE I THINK THEY CAN LAG PEOPLE AND FUCK THEM UP IDK HOW HAXE WORKS
 		if(ClientPrefs.hitsoundVolume > 0) CoolUtil.precacheSound('hitsound');
@@ -3204,7 +3205,7 @@ class PlayState extends MusicBeatState
 			if (SONG.validScore)
 			{
 				#if !switch
-				var percent:Float = ratingPercent;
+				var percent:Float = accuracy;
 				if(Math.isNaN(percent)) percent = 0;
 				Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
 				#end
@@ -3712,15 +3713,12 @@ class PlayState extends MusicBeatState
 			}
 			else if(!ClientPrefs.ghostTapping)
 			{
-				trace("missed but currently broken");
-			}
-			/*
-			else if (!ClientPrefs.ghostTapping)
-			{
 				for (shit in 0...pressArray.length)
-					if (pressArray[shit])
-						noteMiss(shit, null);
-			}*/
+				{ // if a direction is hit that shouldn't be
+					if (pressArray[shit] && !directionList.contains(shit))
+						noteMissPress(shit);
+				}
+			}
 			if(dontCheck && possibleNotes.length > 0 && ClientPrefs.ghostTapping && !cpuControlled)
 			{
 				if (mashViolations > 8)
@@ -3771,19 +3769,21 @@ class PlayState extends MusicBeatState
 	function noteMiss(direction:Int = 0, daNote:Note):Void { //You didn't hit the key and let it go offscreen, also used by Hurt Notes
 		if (!boyfriend.stunned)
 		{
+			combo = 0;
+
 			health -= daNote.missHealth * healthLoss;
 			if(instakillOnMiss)
 			{
 				vocals.volume = 0;
 				doDeathCheck(true);
 			}
-			vocals.volume = 0;
-			combo = 0;
 			songMisses++;
+			vocals.volume = 0;
+			if(!practiceMode) songScore -= 10;
 
 			totalNotesHit -= 1;
-			if(!practiceMode) songScore -= 10;
 			totalPlayed++;
+			updateAccuracy();
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 
@@ -3806,7 +3806,6 @@ class PlayState extends MusicBeatState
 				char.playAnim(animToPlay, true);
 			}
 
-			updateAccuracy();
 		}
 	}
 
@@ -3834,7 +3833,7 @@ class PlayState extends MusicBeatState
 				songMisses++;
 			}
 			totalPlayed++;
-			RecalculateRating();
+			updateAccuracy();
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
@@ -4472,6 +4471,7 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	/*
 	public var ratingName:String = '?';
 	public var ratingPercent:Float;
 	public var ratingFC:String;
@@ -4520,7 +4520,7 @@ class PlayState extends MusicBeatState
 		setOnLuas('rating', ratingPercent);
 		setOnLuas('ratingName', ratingName);
 		setOnLuas('ratingFC', ratingFC);
-	}
+	}*/
 
 	#if ACHIEVEMENTS_ALLOWED
 	private function checkForAchievement(achievesToCheck:Array<String> = null):String
@@ -4557,11 +4557,11 @@ class PlayState extends MusicBeatState
 							}
 						}
 					case 'ur_bad':
-						if(ratingPercent < 0.2 && !practiceMode) {
+						if(accuracy < 0.2 && !practiceMode) {
 							unlock = true;
 						}
 					case 'ur_good':
-						if(ratingPercent >= 1 && !usedPractice) {
+						if(accuracy >= 1 && !usedPractice) {
 							unlock = true;
 						}
 					case 'roadkill_enthusiast':
