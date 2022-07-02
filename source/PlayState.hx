@@ -271,8 +271,6 @@ class PlayState extends MusicBeatState
 	private var keysArray:Array<Dynamic>;
 
 	private var ss:Bool = false;
-	public var accuracy:Float = 0.00;
-	private var accuracyDefault:Float = 0.00;
 	private var totalNotesHit:Float = 0;
 	private var totalNotesHitDefault:Float = 0;
 	var notesHitArray:Array<Date> = [];
@@ -1180,8 +1178,7 @@ class PlayState extends MusicBeatState
 		{
 			startCountdown();
 		}
-		updateAccuracy();
-		//RecalculateRating();
+		RecalculateRating();
 
 		//PRECACHING MISS SOUNDS BECAUSE I THINK THEY CAN LAG PEOPLE AND FUCK THEM UP IDK HOW HAXE WORKS
 		if(ClientPrefs.hitsoundVolume > 0) CoolUtil.precacheSound('hitsound');
@@ -2314,14 +2311,11 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		scoreTxt.text = Ratings.CalculateRanking(songScore,songScoreDef,accuracy);
-
-		/*
 		if(ratingName == '?') {
 			scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName;
 		} else {
 			scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName + ' (' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%)' + ' - ' + ratingFC;//peeps wanted no integer rating
-		}*/
+		}
 
 		if(botplayTxt.visible) {
 			botplaySine += 180 * elapsed;
@@ -3205,7 +3199,7 @@ class PlayState extends MusicBeatState
 			if (SONG.validScore)
 			{
 				#if !switch
-				var percent:Float = accuracy;
+				var percent:Float = ratingPercent;
 				if(Math.isNaN(percent)) percent = 0;
 				Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
 				#end
@@ -3391,7 +3385,6 @@ class PlayState extends MusicBeatState
 				if(!note.ratingDisabled) sicks++;
 		}
 
-		// trace('Wife accuracy loss: ' + wife + ' | Rating: ' + daRating + ' | Score: ' + score + ' | Weight: ' + (1 - wife));
 		if (daRating != 'shit' || daRating != 'bad')
 		{
 			songScore += Math.round(score);
@@ -3783,7 +3776,7 @@ class PlayState extends MusicBeatState
 
 			totalNotesHit -= 1;
 			totalPlayed++;
-			updateAccuracy();
+			RecalculateRating();
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 
@@ -3833,7 +3826,7 @@ class PlayState extends MusicBeatState
 				songMisses++;
 			}
 			totalPlayed++;
-			updateAccuracy();
+			RecalculateRating();
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
@@ -4031,15 +4024,8 @@ class PlayState extends MusicBeatState
 				notes.remove(note, true);
 				note.destroy();
 			}
-			updateAccuracy();
+			RecalculateRating();
 		}
-	}
-
-	function updateAccuracy() 
-	{
-		totalPlayed += 1;
-		accuracy = Math.max(0,totalNotesHit / totalPlayed * 100);
-		accuracyDefault = Math.max(0, totalNotesHitDefault / totalPlayed * 100);
 	}
 
 	function getKeyPresses(note:Note):Int
@@ -4471,7 +4457,6 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	/*
 	public var ratingName:String = '?';
 	public var ratingPercent:Float;
 	public var ratingFC:String;
@@ -4520,7 +4505,7 @@ class PlayState extends MusicBeatState
 		setOnLuas('rating', ratingPercent);
 		setOnLuas('ratingName', ratingName);
 		setOnLuas('ratingFC', ratingFC);
-	}*/
+	}
 
 	#if ACHIEVEMENTS_ALLOWED
 	private function checkForAchievement(achievesToCheck:Array<String> = null):String
@@ -4557,11 +4542,11 @@ class PlayState extends MusicBeatState
 							}
 						}
 					case 'ur_bad':
-						if(accuracy < 0.2 && !practiceMode) {
+						if(ratingPercent < 0.2 && !practiceMode) {
 							unlock = true;
 						}
 					case 'ur_good':
-						if(accuracy >= 1 && !usedPractice) {
+						if(ratingPercent >= 1 && !usedPractice) {
 							unlock = true;
 						}
 					case 'roadkill_enthusiast':
