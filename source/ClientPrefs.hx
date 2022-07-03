@@ -124,7 +124,7 @@ class ClientPrefs {
 		FlxG.save.data.controllerMode = controllerMode;
 		FlxG.save.data.hitsoundVolume = hitsoundVolume;
 		FlxG.save.data.pauseMusic = pauseMusic;
-
+	
 		FlxG.save.flush();
 
 		var save:FlxSave = new FlxSave();
@@ -238,7 +238,7 @@ class ClientPrefs {
 				gameplaySettings.set(name, value);
 			}
 		}
-
+		
 		// flixel automatically saves your volume!
 		if(FlxG.save.data.volume != null)
 		{

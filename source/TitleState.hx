@@ -15,6 +15,10 @@ import flixel.addons.transition.TransitionData;
 import haxe.Json;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
+#if MODS_ALLOWED
+import sys.FileSystem;
+import sys.io.File;
+#end
 import options.GraphicsSettingsSubState;
 //import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -198,7 +202,22 @@ class TitleState extends MusicBeatState
 		logoBl.shader = swagShader.shader;
 
 		titleText = new FlxSprite(titleJSON.startx, titleJSON.starty);
+		#if (desktop && MODS_ALLOWED)
+		var path = "mods/" + Paths.currentModDirectory + "/images/titleEnter.png";
+		//trace(path, FileSystem.exists(path));
+		if (!FileSystem.exists(path)){
+			path = "mods/images/titleEnter.png";
+		}
+		//trace(path, FileSystem.exists(path));
+		if (!FileSystem.exists(path)){
+			path = "assets/images/titleEnter.png";
+		}
+		//trace(path, FileSystem.exists(path));
+		titleText.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path),File.getContent(StringTools.replace(path,".png",".xml")));
+		#else
+		
 		titleText.frames = Paths.getSparrowAtlas('titleEnter');
+		#end
 		titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
 		titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
 		titleText.antialiasing = ClientPrefs.globalAntialiasing;
@@ -371,6 +390,7 @@ class TitleState extends MusicBeatState
 		}
 	}
 
+	private var sickBeats:Int = 0; //Basically curBeat but won't be skipped if you hold the tab or resize the screen
 	public static var closedState:Bool = false;
 	override function beatHit()
 	{
@@ -417,7 +437,7 @@ class TitleState extends MusicBeatState
 				case 14:
 					addMoreText('Night');
 				case 15:
-					addMoreText('Funkin'); 
+					addMoreText('Funkin');
 
 				case 16:
 					skipIntro();
