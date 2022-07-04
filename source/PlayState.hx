@@ -3773,6 +3773,7 @@ class PlayState extends MusicBeatState
 				char.playAnim(animToPlay, true);
 			}
 
+			callOnLuas('noteMiss', [notes.members.indexOf(daNote), daNote.noteData, daNote.noteType, daNote.isSustainNote]);
 		}
 	}
 
@@ -3863,6 +3864,8 @@ class PlayState extends MusicBeatState
 		}
 		StrumPlayAnim(true, Std.int(Math.abs(note.noteData)) % 4, time);
 		note.hitByOpponent = true;
+
+		callOnLuas('opponentNoteHit', [notes.members.indexOf(note), Math.abs(note.noteData), note.noteType, note.isSustainNote]);
 
 		if (!note.isSustainNote)
 		{
@@ -3985,6 +3988,11 @@ class PlayState extends MusicBeatState
 			
 			note.wasGoodHit = true;
 			vocals.volume = 1;
+
+			var isSus:Bool = note.isSustainNote; //GET OUT OF MY HEAD, GET OUT OF MY HEAD, GET OUT OF MY HEAD
+			var leData:Int = Math.round(Math.abs(note.noteData));
+			var leType:String = note.noteType;
+			callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
 			
 			if (!note.isSustainNote)
 			{
