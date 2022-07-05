@@ -5,7 +5,6 @@ import llua.State;
 import llua.Convert;
 #end
 
-import animateatlas.AtlasFrameMaker;
 import flixel.FlxG;
 import flixel.addons.effects.FlxTrail;
 import flixel.input.keyboard.FlxKey;
@@ -274,11 +273,6 @@ class FunkinLua {
 				PlayState.instance.vocals.pause();
 				PlayState.instance.vocals.volume = 0;
 			}
-		});
-
-		Lua_helper.add_callback(lua, "clearUnusedMemory", function() {
-			Paths.clearUnusedMemory();
-			return true;
 		});
 
 		Lua_helper.add_callback(lua, "loadGraphic", function(variable:String, image:String) {
@@ -761,7 +755,9 @@ class FunkinLua {
 			PlayState.instance.addCharacterToList(name, charType);
 		});
 		Lua_helper.add_callback(lua, "precacheImage", function(name:String) {
-			Paths.returnGraphic(name);
+			#if MODS_ALLOWED
+			Paths.addCustomGraphic(name);
+			#end
 		});
 		Lua_helper.add_callback(lua, "precacheSound", function(name:String) {
 			CoolUtil.precacheSound(name);
@@ -1748,12 +1744,6 @@ class FunkinLua {
 	{
 		switch(spriteType.toLowerCase().trim())
 		{	
-			case "texture" | "textureatlas" | "tex":
-				spr.frames = AtlasFrameMaker.construct(image);
-				
-			case "texture_noaa" | "textureatlas_noaa" | "tex_noaa":
-				spr.frames = AtlasFrameMaker.construct(image, null, true);
-				
 			case "packer" | "packeratlas" | "pac":
 				spr.frames = Paths.getPackerAtlas(image);
 			
