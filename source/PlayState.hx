@@ -462,9 +462,11 @@ class PlayState extends MusicBeatState
 				halloweenWhite.alpha = 0;
 				halloweenWhite.blend = ADD;
 
+				#if !html5
 				//PRECACHE SOUNDS
 				CoolUtil.precacheSound('thunder_1');
 				CoolUtil.precacheSound('thunder_2');
+				#end
 
 			case 'philly': //Week 3
 				if(!ClientPrefs.lowQuality) {
@@ -498,7 +500,9 @@ class PlayState extends MusicBeatState
 				add(phillyTrain);
 
 				trainSound = new FlxSound().loadEmbedded(Paths.sound('train_passes'));
+				#if !html5
 				CoolUtil.precacheSound('train_passes');
+				#end
 				FlxG.sound.list.add(trainSound);
 
 				var street:BGSprite = new BGSprite('philly/street', -40, 50);
@@ -544,7 +548,9 @@ class PlayState extends MusicBeatState
 					resetLimoKill();
 
 					//PRECACHE SOUND
+					#if !html5
 					CoolUtil.precacheSound('dancerdeath');
+					#end
 				}
 
 				limo = new BGSprite('limo/limoDrive', -120, 550, 1, 1, ['Limo stage'], true);
@@ -585,7 +591,9 @@ class PlayState extends MusicBeatState
 
 				santa = new BGSprite('christmas/santa', -840, 150, 1, 1, ['santa idle in fear']);
 				add(santa);
+				#if !html5
 				CoolUtil.precacheSound('Lights_Shut_off');
+				#end
 
 			case 'mallEvil': //Week 5 - Winter Horrorland
 				var bg:BGSprite = new BGSprite('christmas/evilBG', -400, -500, 0.2, 0.2);
@@ -1172,6 +1180,7 @@ class PlayState extends MusicBeatState
 		}
 		RecalculateRating();
 
+		#if !html5
 		//PRECACHING MISS SOUNDS BECAUSE I THINK THEY CAN LAG PEOPLE AND FUCK THEM UP IDK HOW HAXE WORKS
 		if(ClientPrefs.hitsoundVolume > 0) CoolUtil.precacheSound('hitsound');
 		CoolUtil.precacheSound('missnote1');
@@ -1183,6 +1192,7 @@ class PlayState extends MusicBeatState
 		} else if(ClientPrefs.pauseMusic != 'None') {
 			CoolUtil.precacheMusic(Paths.formatToSongPath(ClientPrefs.pauseMusic));
 		}
+		#end
 
 		#if desktop
 		// Updating Discord Rich Presence.
@@ -1379,8 +1389,10 @@ class PlayState extends MusicBeatState
 
 		if(dialogueFile.dialogue.length > 0) {
 			inCutscene = true;
+			#if !html5
 			CoolUtil.precacheSound('dialogue');
 			CoolUtil.precacheSound('dialogueClose');
+			#end
 			psychDialogue = new DialogueBoxPsych(dialogueFile, song);
 			psychDialogue.scrollFactor.set();
 			if(endingSong) {

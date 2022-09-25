@@ -1,5 +1,6 @@
 package;
 
+import openfl.media.Sound;
 import animateatlas.AtlasFrameMaker;
 import flixel.math.FlxPoint;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
@@ -19,8 +20,6 @@ import sys.FileSystem;
 #end
 import flixel.graphics.FlxGraphic;
 import openfl.display.BitmapData;
-
-import flash.media.Sound;
 
 using StringTools;
 
@@ -108,7 +107,9 @@ class Paths
 		}	
 		// flags everything to be cleared out next unused memory clear
 		localTrackedAssets = [];
+		#if !html5
 		openfl.Assets.cache.clear("songs");
+		#end
 	}
 
 	static public var currentModDirectory:String = '';
@@ -219,16 +220,24 @@ class Paths
 
 	inline static public function voices(song:String):Any
 	{
+		#if html5
+		return 'songs:assets/songs/${song.toLowerCase().replace(' ', "-")}/Voices.$SOUND_EXT';
+		#else
 		var songKey:String = '${song.toLowerCase().replace(' ', '-')}/Voices';
 		var voices = returnSound('songs', songKey);
 		return voices;
+		#end
 	}
 
 	inline static public function inst(song:String):Any
 	{
+		#if html5
+		return 'songs:assets/songs/${song.toLowerCase().replace(' ', "-")}/Inst.$SOUND_EXT';
+		#else
 		var songKey:String = '${song.toLowerCase().replace(' ', '-')}/Inst';
 		var inst = returnSound('songs', songKey);
 		return inst;
+		#end
 	}
 
 	inline static public function image(key:String, ?library:String):FlxGraphic
@@ -373,14 +382,10 @@ class Paths
 		// trace(gottenPath);
 		if(!currentTrackedSounds.exists(gottenPath))
 		{
-			var folder:String = '';
-			
-			if (path == 'songs')
-				folder = 'songs:';
 			#if MODS_ALLOWED
 			currentTrackedSounds.set(gottenPath, Sound.fromFile('./' + gottenPath));
 			#else
-			currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(folder + getPath('$path/$key.$SOUND_EXT', SOUND, library)));
+			currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(getPath('$path/$key.$SOUND_EXT', SOUND, library)));
 			#end
 
 		}
